@@ -1,0 +1,37 @@
+[
+  {
+    "username": "admin",
+    "password": "admin",
+    "userid": 1
+  },
+  {
+    "username": "Steve",
+    "password": "Steve",
+    "userid": 2
+  },
+  {
+    "username": "Boobalan",
+    "password": "Boobalan",
+    "userid": 3
+  },
+  {
+    "username": "Indhulekha",
+    "password": "Indhulekha",
+    "userid": 4
+  },
+  {
+    "username": "Khalifullah",
+    "password": "Khalifullah",
+    "userid": 5
+  },
+  {
+    "username": "Abdul",
+    "password": "Abdul",
+    "userid": 6
+  },
+  {
+    "username": "John",
+    "password": "John",
+    "userid": 7
+  }
+]
