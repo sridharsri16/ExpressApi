@@ -21,5 +21,12 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
     });
+
+    //foreign key
+  login.associate = models => {
+    login.hasOne(models.candidatedetails, {
+      foreignKey: 'loginid'
+    });
+    };
     return login;
   };

@@ -42,11 +42,9 @@ module.exports = (sequelize, DataTypes) => {
   });
   //foreign key
   candidatedetails.associate = models => {
-    candidatedetails.belongsTo(models.login, {
-      foreignKey: {
-        allowNull: false,
-      },
-    });
+  candidatedetails.belongsTo(models.login, {
+    foreignKey: 'id'
+  });
   };
 
   return candidatedetails;

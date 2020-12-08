@@ -5,12 +5,12 @@ const db = require("../../models");
 
 // Gets All Candidates
 router.get('/', (req, res) => {
-  db.candidatedetails.findAll().then(details => res.send(details));
+  db.login.findAll({ include: [db.candidatedetails] }).then(details => res.send(details));
 });
 
 // Get Single Candidate
 router.get('/:id', (req, res) => {
-  db.candidatedetails.findAll({
+  db.candidatedetails.findOne({
     where: {
       id: req.params.id
     }
@@ -19,36 +19,55 @@ router.get('/:id', (req, res) => {
 
 // Create Candidate
 router.post('/', (req, res) => {
-  db.login.create({
-    name: req.body.name,
-    password: req.body.password,
-    votecount: 0,
-    isadmin: false,
-    voted: false
-  }).then(details => {
-    if (!details) {
-      return res.status(400).json({ msg: 'No data inserted' });
-    }
-    else {
-      details = details.map(details => details.dataValues)
-      db.candidatedetails.create({
-        loginid: details[0].id,
-        challengessolved: req.body.challengessolved,
-        expertlevel: req.body.expertlevel,
-        ds: req.body.ds,
-        algorithm: req.body.algorithm,
-        c: req.body.c,
-        java: req.body.java,
-        phyton: req.body.phyton,
-      })
-    }
-    res.send(true);
-  });
+
+  if (req.body.role == 'admin') {
+    console.log(req.body)
+    db.login.create({
+      name: req.body.name,
+      password: req.body.password,
+      votecount: 0,
+      isadmin: true,
+      voted: false
+    }).then(details => {
+      res.send(true);
+    });
+  } else {
+    db.login.create({
+      name: req.body.name,
+      password: req.body.password,
+      votecount: 0,
+      isadmin: false,
+      voted: false
+    }).then(details => {
+      if (!details) {
+        return res.status(400).json({ msg: 'No data inserted' });
+      }
+      else {
+        db.candidatedetails.create({
+          loginid: details.dataValues.id,
+          challengessolved: req.body.challengessolved,
+          expertlevel: req.body.expertlevel,
+          ds: req.body.ds,
+          algorithm: req.body.algorithm,
+          c: req.body.c,
+          java: req.body.java,
+          phyton: req.body.phyton,
+        }).then(details => {
+          console.log(details.dataValues)
+          if (!details) {
+            return res.status(400).json({ msg: 'No candidate details inserted' });
+          }
+          else {
+            res.send(true);
+          }
+        })
+      }
+    });
+  }
 });
 
 // Update Candidate
 router.put('/:id', (req, res) => {
-  let done = false;
   db.candidatedetails.update(
     {
       challengessolved: req.body.challengessolved,
@@ -60,22 +79,32 @@ router.put('/:id', (req, res) => {
       phyton: req.body.phyton,
     },
     {
-      where: { id: req.body.candidateid }
+      where: { id: req.params.id }
     }
   ).then((details) => {
-    details = details.map(details => details.dataValues)
-    done = true
-    if ((req.body.name && req.body.password) && done) {
-      db.login.update(
-        {
-          name: req.body.name,
-          password: req.body.password,
-        },
-        {
-          where: { id: details[0].id }
+    if (details == 1) {
+      db.candidatedetails.findOne({
+        where: {
+          id: req.params.id
         }
-      ).then(() => done = true);
-      res.send("success")
+      }).then(details => {
+        console.log(details)
+        if (req.body.name || req.body.password) {
+          db.login.update(
+            {
+              name: req.body.name,
+              password: req.body.password,
+            },
+            {
+              where: { id: details.dataValues.loginid }
+            }
+          ).then(() => res.send("success"));
+        }
+        res.send(details)
+      });
+    }
+    else {
+      return res.status(400).json({ msg: 'No data found for the given id' });
     }
   });
 
@@ -83,18 +112,31 @@ router.put('/:id', (req, res) => {
 
 // Delete Candidate
 router.delete('/:id', (req, res) => {
+  var data;
+  db.candidatedetails.findOne({
+    where: {
+      id: req.params.id
+    }
+  }).then(details => {
+    data = details.dataValues
+  });
   db.candidatedetails.destroy({
     where: {
       id: req.params.id
     }
   }).then((details) => {
-    details = details.map(details => details.dataValues)
-    db.login.destroy({
-      where: {
-        id: details[0].loginid
-      }
-    })
-    res.send(true)
+    console.log(data)
+    if (details == 1) {
+      db.login.destroy({
+        where: {
+          id: data.loginid
+        }
+      })
+      res.send(true)
+    }
+    else {
+      return res.status(400).json({ msg: 'No data found for the given id' });
+    }
   });
 });
 

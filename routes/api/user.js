@@ -10,41 +10,44 @@ router.post('/', (req, res) => {
       password: req.body.password
     }
   }).then(details => {
+    console.log(details)
     if (!details) {
       return res.status(400).json({ msg: 'No Records Found' });
     }
-    details = details.map(details => details.dataValues)
+    //details = details.map(details => details.dataValues) if we use findall we can use map
     console.log(details)
-    if (details[0].isadmin == true) {
+    if (details.dataValues.isadmin == true) {
       res.send(details)
     }
     else {
       db.candidatedetails.findOne({
         where: {
-          loginid: details[0].id
+          loginid: details.dataValues.id
         }
       }).then(candidatedetails => {
         if (!candidatedetails) {
           return res.status(400).json({ msg: 'No Candidate details Found' });
         }
-        candidatedetails = candidatedetails.map(candidatedetails => candidatedetails.dataValues)
-        console.log(candidatedetails);
-        let data = {
-          name: details[0].name,
-          password: details[0].password,
-          votecount: details[0].votecount,
-          isadmin: false,
-          voted: details[0].voted,
-          loginid: candidatedetails[0].loginid,
-          challengessolved: candidatedetails[0].challengessolved,
-          expertlevel: candidatedetails[0].expertlevel,
-          ds: candidatedetails[0].ds,
-          algorithm: candidatedetails[0].algorithm,
-          c: candidatedetails[0].c,
-          java: candidatedetails[0].java,
-          phyton: candidatedetails[0].phyton,
-        };
-
+        //candidatedetails = candidatedetails.map(candidatedetails => candidatedetails.dataValues)
+        else {
+          console.log(candidatedetails);
+          var data = {
+            candidateid:candidatedetails.dataValues.id,
+            name: details.dataValues.name,
+            password: details.dataValues.password,
+            votecount: details.dataValues.votecount,
+            isadmin: false,
+            voted: details.dataValues.voted,
+            loginid: candidatedetails.dataValues.loginid,
+            challengessolved: candidatedetails.dataValues.challengessolved,
+            expertlevel: candidatedetails.dataValues.expertlevel,
+            ds: candidatedetails.dataValues.ds,
+            algorithm: candidatedetails.dataValues.algorithm,
+            c: candidatedetails.dataValues.c,
+            java: candidatedetails.dataValues.java,
+            phyton: candidatedetails.dataValues.phyton,
+          };
+        }
         res.send(data)
       });
     }
