@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require("../../models");
 
 router.post('/', (req, res) => {
+    var temploginddata;
     console.log(req.body.whovoted, req.body.votedfor)
     db.login.findOne({
         where: {
@@ -32,18 +33,17 @@ router.post('/', (req, res) => {
                                 loginid: req.body.whovoted,
                             }
                         }).then(candidatedetails => {
-                            console.log(candidatedetails);
                             if (!candidatedetails) {
                                 return res.status(400).json({ msg: 'Admin' });
                             }
                             //candidatedetails = candidatedetails.map(candidatedetails => candidatedetails.dataValues)
                             else {
                                 var data = {
-                                    name: details.dataValues.name,
-                                    password: details.dataValues.password,
-                                    votecount: details.dataValues.votecount,
+                                    name: "",
+                                    password: "",
+                                    votecount: 0,
                                     isadmin: false,
-                                    voted: details.dataValues.voted,
+                                    voted: false,
                                     loginid: candidatedetails.dataValues.loginid,
                                     challengessolved: candidatedetails.dataValues.challengessolved,
                                     expertlevel: candidatedetails.dataValues.expertlevel,
@@ -53,8 +53,20 @@ router.post('/', (req, res) => {
                                     java: candidatedetails.dataValues.java,
                                     phyton: candidatedetails.dataValues.phyton,
                                 };
+                                db.login.findOne({
+                                    where: {
+                                        id: candidatedetails.dataValues.loginid,
+                                    }
+                                }).then(logindata => {
+                                    data.name = logindata.dataValues.name;
+                                    data.password = logindata.dataValues.password;
+                                    data.votecount = logindata.dataValues.votecount;
+                                    data.voted = logindata.dataValues.voted;
+                                    res.send(data)
+                                });
                             }
-                            res.send(data)
+                            console.log(data)
+
                         });
                     })
             });
