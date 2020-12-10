@@ -12,7 +12,7 @@ router.post('/', (req, res) => {
   }).then(details => {
     console.log(details)
     if (!details) {
-      return res.status(400).json({ msg: 'No Records Found' });
+      return res.status(200).json({ msg: 'No Records Found' });
     }
     //details = details.map(details => details.dataValues) if we use findall we can use map
     console.log(details)
