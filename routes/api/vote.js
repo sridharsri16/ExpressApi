@@ -33,8 +33,10 @@ router.post('/', (req, res) => {
                                 loginid: req.body.whovoted,
                             }
                         }).then(candidatedetails => {
-                            if (!candidatedetails) {
-                                return res.status(400).json({ msg: 'Admin' });
+                            console.log(candidatedetails)
+                            if (candidatedetails == null) {
+                                console.log(candidatedetails)
+                                return res.status(200).json({ msg: 'admin' });
                             }
                             //candidatedetails = candidatedetails.map(candidatedetails => candidatedetails.dataValues)
                             else {
