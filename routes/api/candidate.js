@@ -10,10 +10,11 @@ router.get('/', (req, res) => {
 
 // Get Single Candidate
 router.get('/:id', (req, res) => {
-  db.candidatedetails.findOne({
+  db.login.findOne({
     where: {
       id: req.params.id
-    }
+    },
+    include: [db.candidatedetails] 
   }).then(details => res.send(details));
 });
 
